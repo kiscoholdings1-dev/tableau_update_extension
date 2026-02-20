@@ -1,0 +1,35 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Update Popup</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="lib/tableau.extensions.1.latest.min.js"></script>
+</head>
+<body>
+
+  <div id="overlay" class="hidden" role="dialog" aria-modal="true">
+    <div id="popup">
+
+      <!-- ✅ 상단 헤더: 좌(제목/버전) / 우(다시보지않기 + X) -->
+      <div class="header">
+        <div class="header-left">
+          <div id="title" class="title">업데이트 안내</div>
+          <div id="version" class="version"></div>
+        </div>
+
+        <div class="header-actions">
+          <button id="dontShowBtn" type="button" class="dont-top">다시 보지 않기</button>
+          <button id="closeBtn" type="button" class="close" aria-label="닫기">×</button>
+        </div>
+      </div>
+
+      <ul id="items" class="items"></ul>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
