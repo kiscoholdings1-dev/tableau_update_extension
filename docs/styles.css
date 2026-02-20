@@ -1,0 +1,134 @@
+/* styles.css */
+body { margin: 0; font-family: sans-serif; }
+
+
+/* ✅ 숨김은 overlay에만 적용해도 충분 */
+#overlay.hidden { display: none; }
+
+#overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  /* ✅ 딤 제거 */
+  background: transparent;
+
+  /* ✅ 화면 크기에 따라 자동 여백 */
+  padding: clamp(12px, 6vh, 72px) 12px 12px;
+}
+
+#popup{
+  position: relative;
+  width: min(820px, 100%);
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+
+  background: #fff;
+  border-radius: 18px;
+  padding: 22px 22px 18px;
+  box-sizing: border-box;
+
+  border: 1px solid #e6e6e6;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+}
+
+/* ✅ 헤더 레이아웃 */
+.header{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.header-left{
+  min-width: 0;
+}
+
+.title{
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.version{
+  margin-top: 8px;
+  font-size: 15px;
+  color: #444;
+}
+
+/* ✅ 우측 상단 액션들 */
+.header-actions{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* ✅ 다시 보지 않기: 보조 액션(링크 느낌) */
+.dont-top{
+  background: none;
+  border: none;
+  padding: 8px 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #666;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.dont-top:hover{
+  color: #111;
+  text-decoration: underline;
+}
+
+/* ✅ X 버튼 */
+.close{
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: #f2f2f2;
+  border-radius: 10px;
+
+  font-size: 28px;
+  cursor: pointer;
+  line-height: 44px;
+  text-align: center;
+}
+.close:hover { background: #e0e0e0; }
+
+/* 아이템 목록 */
+.items{
+  margin: 8px 0 0;
+  padding-left: 22px;
+}
+
+.items li{
+  margin: 10px 0;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+/* 모바일 대응(깨짐 방지) */
+@media (max-width: 600px){
+  #overlay{
+    padding: 12px 10px 10px;
+  }
+  #popup{
+    border-radius: 14px;
+    padding: 18px 16px 14px;
+    max-height: calc(100vh - 22px);
+  }
+  .title{ font-size: 18px; }
+  .items li{ font-size: 15px; }
+  .close{
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    line-height: 40px;
+  }
+  .dont-top{ font-size: 13px; }
+}
