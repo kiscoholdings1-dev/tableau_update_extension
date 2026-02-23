@@ -1,3 +1,9 @@
 {
-  "dashboardsByName": {}
+  "dashboardsByName": {
+    "종합 대시보드": {
+      "version": "2026-02-23-01",
+      "title": "영업 부문 업데이트",
+      "items": ["철근 출하 현황: 수출 분류 추가"]
+    }
+  }
 }
