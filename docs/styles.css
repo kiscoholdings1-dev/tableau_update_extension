@@ -1,6 +1,8 @@
 /* styles.css */
 body { margin: 0; font-family: sans-serif; }
 
+/* ✅ 공용 숨김 클래스 */
+.hidden { display: none !important; }
 
 /* ✅ 숨김은 overlay에만 적용해도 충분 */
 #overlay.hidden { display: none; }
@@ -45,9 +47,7 @@ body { margin: 0; font-family: sans-serif; }
   margin-bottom: 12px;
 }
 
-.header-left{
-  min-width: 0;
-}
+.header-left{ min-width: 0; }
 
 .title{
   font-weight: 800;
@@ -114,9 +114,7 @@ body { margin: 0; font-family: sans-serif; }
 
 /* 모바일 대응(깨짐 방지) */
 @media (max-width: 600px){
-  #overlay{
-    padding: 12px 10px 10px;
-  }
+  #overlay{ padding: 12px 10px 10px; }
   #popup{
     border-radius: 14px;
     padding: 18px 16px 14px;
@@ -132,3 +130,29 @@ body { margin: 0; font-family: sans-serif; }
   }
   .dont-top{ font-size: 13px; }
 }
+
+/* =========================
+   ✅ 편집모드 런처 + 동작
+   ========================= */
+
+/* 편집모드에서는 overlay(팝업 자동 노출) 자체를 숨김 */
+body.edit-mode #overlay { display: none !important; }
+
+/* 우하단 런처 */
+.mini-launcher{
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 10000;
+}
+
+.mini-btn{
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+}
+.mini-btn:hover{ background: #f6f6f6; }
