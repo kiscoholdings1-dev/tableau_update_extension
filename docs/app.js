@@ -12,13 +12,13 @@ function storageKey(dashboardName) {
   return `updatePopup_seenVersion_${dashboardName}`;
 }
 
-/** ✅ 편집모드: ?edit=1 이면 ON, ?edit=0 이면 OFF, 없으면 localStorage 값 */
 function isEditMode() {
-  const params = new URLSearchParams(window.location.search);
-  const p = params.get("edit");
-  if (p === "1") return true;
-  if (p === "0") return false;
-  return localStorage.getItem("updatePopup_editMode") === "1";
+  // Tableau가 제공하는 현재 모드 (authoring / viewing)
+  try {
+    return tableau?.extensions?.environment?.mode === "authoring";
+  } catch {
+    return false;
+  }
 }
 
 /** ✅ 편집모드 UI 적용: overlay는 숨기고, miniLauncher 버튼만 노출 */
