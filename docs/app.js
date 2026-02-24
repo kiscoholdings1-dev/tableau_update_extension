@@ -12,27 +12,6 @@ function storageKey(dashboardName) {
   return `updatePopup_seenVersion_${dashboardName}`;
 }
 
-function isEditMode() {
-  // Tableau가 제공하는 현재 모드 (authoring / viewing)
-  try {
-    return tableau?.extensions?.environment?.mode === "authoring";
-  } catch {
-    return false;
-  }
-}
-
-/** ✅ 편집모드 UI 적용: overlay는 숨기고, miniLauncher 버튼만 노출 */
-function applyEditModeUI(on) {
-  document.body.classList.toggle("edit-mode", on);
-
-  const launcher = document.getElementById("miniLauncher");
-  if (launcher) launcher.classList.toggle("hidden", !on);
-
-  // 혹시 overlay가 떠있던 상태에서 편집모드로 들어오면 닫아줌
-  const overlay = document.getElementById("overlay");
-  if (on && overlay) overlay.classList.add("hidden");
-}
-
 async function fetchJson(url) {
   const res = await fetch(`${url}?v=${Date.now()}`); // 캐시 방지
   if (!res.ok) throw new Error(`Config fetch failed: ${res.status}`);
@@ -42,9 +21,6 @@ async function fetchJson(url) {
 (async function main() {
   try {
     await tableau.extensions.initializeAsync();
-
-    // ✅ 현재 페이지가 편집모드인지 먼저 UI 반영
-    applyEditModeUI(isEditMode());
 
     const dashboard = tableau.extensions.dashboardContent.dashboard;
     const dashboardName = (dashboard.name || "").trim();
@@ -59,20 +35,6 @@ async function fetchJson(url) {
     const seen = localStorage.getItem(storageKey(dashboardName));
     if (seen === config.version) return;
 
-    // ✅ 편집모드면 자동팝업 띄우지 않고 "업데이트" 버튼만 세팅
-    if (isEditMode()) {
-      const openBtn = document.getElementById("openUpdatesBtn");
-      if (openBtn) {
-        openBtn.onclick = (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          showPopup(config, dashboardName);
-        };
-      }
-      return;
-    }
-
-    // 일반모드: 자동 팝업
     showPopup(config, dashboardName);
   } catch (e) {
     console.error(e);
@@ -101,9 +63,6 @@ function showPopup(config, dashboardName) {
     console.error("Popup DOM elements missing");
     return;
   }
-
-  // ✅ 편집모드여도 버튼 눌렀을 때는 팝업 보여줘야 하니까 강제로 표시
-  overlay.classList.remove("hidden");
 
   titleEl.textContent = config.title || "업데이트 안내";
 
@@ -159,4 +118,6 @@ function showPopup(config, dashboardName) {
     e.stopPropagation();
     hideAndSave();
   };
+
+  overlay.classList.remove("hidden");
 }
