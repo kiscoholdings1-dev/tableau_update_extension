@@ -5,10 +5,32 @@ if (typeof tableau === "undefined") {
   throw new Error("tableau is not defined");
 }
 
-const CONFIG_URL = "https://kiscoholdings1-dev.github.io/tableau_update_extension/updates.json";
+const CONFIG_URL =
+  "https://kiscoholdings1-dev.github.io/tableau_update_extension/updates.json";
 
 function storageKey(dashboardName) {
   return `updatePopup_seenVersion_${dashboardName}`;
+}
+
+/** ✅ 편집모드: ?edit=1 이면 ON, ?edit=0 이면 OFF, 없으면 localStorage 값 */
+function isEditMode() {
+  const params = new URLSearchParams(window.location.search);
+  const p = params.get("edit");
+  if (p === "1") return true;
+  if (p === "0") return false;
+  return localStorage.getItem("updatePopup_editMode") === "1";
+}
+
+/** ✅ 편집모드 UI 적용: overlay는 숨기고, miniLauncher 버튼만 노출 */
+function applyEditModeUI(on) {
+  document.body.classList.toggle("edit-mode", on);
+
+  const launcher = document.getElementById("miniLauncher");
+  if (launcher) launcher.classList.toggle("hidden", !on);
+
+  // 혹시 overlay가 떠있던 상태에서 편집모드로 들어오면 닫아줌
+  const overlay = document.getElementById("overlay");
+  if (on && overlay) overlay.classList.add("hidden");
 }
 
 async function fetchJson(url) {
@@ -20,6 +42,9 @@ async function fetchJson(url) {
 (async function main() {
   try {
     await tableau.extensions.initializeAsync();
+
+    // ✅ 현재 페이지가 편집모드인지 먼저 UI 반영
+    applyEditModeUI(isEditMode());
 
     const dashboard = tableau.extensions.dashboardContent.dashboard;
     const dashboardName = (dashboard.name || "").trim();
@@ -34,6 +59,20 @@ async function fetchJson(url) {
     const seen = localStorage.getItem(storageKey(dashboardName));
     if (seen === config.version) return;
 
+    // ✅ 편집모드면 자동팝업 띄우지 않고 "업데이트" 버튼만 세팅
+    if (isEditMode()) {
+      const openBtn = document.getElementById("openUpdatesBtn");
+      if (openBtn) {
+        openBtn.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          showPopup(config, dashboardName);
+        };
+      }
+      return;
+    }
+
+    // 일반모드: 자동 팝업
     showPopup(config, dashboardName);
   } catch (e) {
     console.error(e);
@@ -50,20 +89,31 @@ function showPopup(config, dashboardName) {
   const versionEl = document.getElementById("version");
   const itemsEl = document.getElementById("items");
 
-  if (!overlay || !popup || !closeBtn || !dontBtn || !titleEl || !versionEl || !itemsEl) {
+  if (
+    !overlay ||
+    !popup ||
+    !closeBtn ||
+    !dontBtn ||
+    !titleEl ||
+    !versionEl ||
+    !itemsEl
+  ) {
     console.error("Popup DOM elements missing");
     return;
   }
 
+  // ✅ 편집모드여도 버튼 눌렀을 때는 팝업 보여줘야 하니까 강제로 표시
+  overlay.classList.remove("hidden");
+
   titleEl.textContent = config.title || "업데이트 안내";
 
   if (config.version) {
-    const datePart = config.version.split("-").slice(0,3).join(".");
+    const datePart = config.version.split("-").slice(0, 3).join(".");
     versionEl.textContent = `업데이트 일자: ${datePart}`;
   } else {
     versionEl.textContent = "";
   }
-  
+
   // items 렌더
   itemsEl.innerHTML = "";
   const items = Array.isArray(config.items) ? config.items : [];
@@ -109,6 +159,4 @@ function showPopup(config, dashboardName) {
     e.stopPropagation();
     hideAndSave();
   };
-
-  overlay.classList.remove("hidden");
 }
