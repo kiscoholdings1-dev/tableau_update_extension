@@ -24,10 +24,8 @@ function normalizeItems(items) {
   return arr.map((x) => String(x ?? "").trim()).filter(Boolean);
 }
 
-function getSeenVersions(dashboardName) {
-  const settingsSeen = tableau.extensions.settings.get(seenKey(dashboardName)) || null;
-  const localSeen = localStorage.getItem(storageKey(dashboardName)) || null;
-  return { settingsSeen, localSeen };
+function getSeenVersion(dashboardName) {
+  return localStorage.getItem(storageKey(dashboardName)) || null;
 }
 
 // 한글/특수문자 안전 Base64
@@ -46,11 +44,10 @@ function buildDialogUrl(payloadString) {
   return dialog.toString();
 }
 
-// ✅ “한 번 닫으면 다음엔 안 뜸”을 보장하려면:
-//    dialog를 열기 직전에 seen 저장을 먼저 해버리면 됨
-async function markSeen(dashboardName, version) {
-  // localStorage는 즉시 반영
+
+function markSeen(dashboardName, version) {
   localStorage.setItem(storageKey(dashboardName), version);
+}
 
   // settings는 Cloud 안정성용(비동기 저장)
   tableau.extensions.settings.set(seenKey(dashboardName), version);
@@ -74,8 +71,8 @@ async function markSeen(dashboardName, version) {
     if (items.length === 0) return;
 
     // 3) 이미 본 버전이면 종료
-    const { settingsSeen, localSeen } = getSeenVersions(dashboardName);
-    if (settingsSeen === config.version || localSeen === config.version) return;
+    const seen = getSeenVersion(dashboardName);
+    if (seen === config.version) return;
 
     // 4) payload
     const payload = JSON.stringify({
@@ -87,7 +84,7 @@ async function markSeen(dashboardName, version) {
     });
 
     // ✅ 중요: dialog 열기 전에 먼저 seen 저장
-    await markSeen(dashboardName, config.version);
+    markSeen(dashboardName, config.version);
 
     // 5) dialog 표시
     const dialogUrl = buildDialogUrl(payload);
