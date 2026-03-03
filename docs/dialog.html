@@ -1,90 +1,39 @@
-html, body {
-  margin: 0;
-  padding: 0;
-  background: transparent;
-  font-family: sans-serif;
-}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Update Popup</title>
 
-#popup{
-  box-sizing: border-box;
-  padding: 22px 22px 18px;
-  max-height: 100vh;
-  overflow: auto;
-}
+  <link rel="stylesheet" href="styles.css?v=16" />
+  <script src="lib/tableau.extensions.1.latest.min.js"></script>
+</head>
+<body>
+  <div id="popup">
+    <div class="header">
+      <div class="header-left">
+        <div class="title-row">
 
-.header{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 14px;
-}
+          <!-- ✅ 뱃지: 업데이트 내역 '앞' -->
+          <div id="dashBadge" class="dash-badge" style="display:none;"></div>
 
-.header-left{ min-width: 0; }
+          <div class="title">업데이트 내역</div>
+          <div id="headerDate" class="header-date"></div>
 
-.title-row{
-  display: flex;
-  align-items: center;   /* ✅ 배지/타이틀/일자 수평 정렬 안정 */
-  gap: 10px;
-  min-width: 0;
-  flex-wrap: wrap;
-}
+        </div>
+      </div>
+    </div>
 
-.title{
-  font-weight: 900;
-  font-size: 22px;
-  line-height: 1.2;
-  white-space: nowrap;
-}
+    <div class="divider"></div>
 
-.header-date{
-  font-size: 14px;
-  font-weight: 800;
-  color: #555;
-  white-space: nowrap;
-}
+    <!-- ✅ 팝업 동작 안내 -->
+    <div class="popup-info">
+      <p>업데이트가 있을 경우, 현재 사용 중인 브라우저에서 1회 자동으로 열립니다.</p>
+      <p>브라우저 또는 PC가 변경되면 다시 표시될 수 있습니다.</p>
+    </div>
 
-/* ✅ 산뜻한 강조 뱃지 */
-.dash-badge{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+    <ul id="items" class="items"></ul>
+  </div>
 
-  padding: 7px 12px;
-  border-radius: 999px;
-
-  /* 산뜻한 블루 톤 */
-  background: #eaf2ff;
-  border: 1px solid #b9d3ff;
-  color: #1e4fbf;
-
-  font-size: 15px;      /* ✅ 글자 키움 */
-  font-weight: 900;
-  letter-spacing: 0.2px;
-  white-space: nowrap;
-}
-
-.divider{
-  height: 1px;
-  background: #e6e6e6;
-  margin: 14px 0 14px;
-}
-
-.items{
-  margin: 0;
-  padding-left: 20px;
-}
-
-.items li{
-  margin: 10px 0;
-  font-size: 16px;
-  line-height: 1.65;
-  color: #111;
-}
-
-@media (max-width: 600px){
-  #popup{ padding: 18px 16px 14px; }
-  .title{ font-size: 18px; }
-  .items li{ font-size: 15px; }
-  .header-date{ font-size: 13px; }
-  .dash-badge{ font-size: 14px; padding: 6px 11px; }
-}
+  <script src="dialog.js?v=15"></script>
+</body>
+</html>
