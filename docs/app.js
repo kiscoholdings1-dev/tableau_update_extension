@@ -49,10 +49,6 @@ function markSeen(dashboardName, version) {
   localStorage.setItem(storageKey(dashboardName), version);
 }
 
-  // settings는 Cloud 안정성용(비동기 저장)
-  tableau.extensions.settings.set(seenKey(dashboardName), version);
-  await tableau.extensions.settings.saveAsync();
-}
 
 (async function main() {
   try {
