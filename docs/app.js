@@ -3,7 +3,7 @@ if (typeof tableau === "undefined") {
   throw new Error("tableau is not defined");
 }
 
-const CONFIG_URL = "https://kiscoholdings1-dev.github.io/tableau_update_extension/updates.json";;
+const CONFIG_URL = "https://kiscoholdings1-dev.github.io/tableau_update_extension/updates.json";
 const EXT_VER = "13";
 
 function seenKey(dashboardName) {
