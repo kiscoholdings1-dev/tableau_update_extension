@@ -1,4 +1,4 @@
-// dialog.js?v=15
+// dialog.js?v=17
 
 function fromB64(b64) {
   return decodeURIComponent(escape(atob(b64)));
@@ -7,6 +7,51 @@ function fromB64(b64) {
 function normalizeItems(items) {
   const arr = Array.isArray(items) ? items : [];
   return arr.map((x) => String(x ?? "").trim()).filter(Boolean);
+}
+
+function normalizeText(value) {
+  return String(value ?? "").trim();
+}
+
+function normalizeContext(context) {
+  const source = context && typeof context === "object" ? context : {};
+  return {
+    purpose: normalizeText(source.purpose),
+    usage: normalizeText(source.usage),
+    collaboration: normalizeText(source.collaboration)
+  };
+}
+
+function normalizeDetail(detail) {
+  const source = detail && typeof detail === "object" ? detail : {};
+  return {
+    title: normalizeText(source.title),
+    purpose: normalizeText(source.purpose),
+    usage: normalizeItems(source.usage),
+    collaboration: normalizeText(source.collaboration)
+  };
+}
+
+function normalizeDetails(details) {
+  const arr = Array.isArray(details) ? details : [];
+  return arr
+    .map(normalizeDetail)
+    .filter((detail) =>
+      detail.title &&
+      (detail.purpose || detail.usage.length > 0 || detail.collaboration)
+    );
+}
+
+function normalizePayload(payload) {
+  const source = payload && typeof payload === "object" ? payload : {};
+  return {
+    dashboardName: normalizeText(source.dashboardName),
+    version: normalizeText(source.version),
+    summary: normalizeText(source.summary),
+    highlights: normalizeItems(source.highlights ?? source.items),
+    context: normalizeContext(source.context),
+    details: normalizeDetails(source.details)
+  };
 }
 
 function formatYYMMDDFromVersion(version) {
@@ -21,6 +66,11 @@ function setText(id, text) {
   if (el) el.textContent = text;
 }
 
+function setSectionVisible(id, visible) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = visible ? "" : "none";
+}
+
 function renderList(items) {
   const itemsEl = document.getElementById("items");
   if (!itemsEl) return;
@@ -33,7 +83,12 @@ function renderList(items) {
 }
 
 function readPayload() {
-  const raw = tableau.extensions.ui.dialogPayload;
+  const previewPayload = window.__UPDATE_PREVIEW_PAYLOAD__;
+  if (previewPayload && typeof previewPayload === "object") {
+    return previewPayload;
+  }
+
+  const raw = window.tableau?.extensions?.ui?.dialogPayload;
   if (raw && String(raw).trim().length > 0) {
     try { return JSON.parse(raw); } catch {}
   }
@@ -45,10 +100,120 @@ function readPayload() {
   return {};
 }
 
-/* ✅ "구매 대시보드" -> "구매" */
+function renderSummary(summary) {
+  const hasSummary = Boolean(summary);
+  setSectionVisible("summarySection", hasSummary);
+  if (hasSummary) setText("summaryText", summary);
+}
+
+function createMetaRow(label, value) {
+  if (!value) return null;
+
+  const row = document.createElement("div");
+  row.className = "detail-meta-row";
+
+  const labelEl = document.createElement("div");
+  labelEl.className = "detail-meta-label";
+  labelEl.textContent = `● ${label}`;
+
+  const textEl = document.createElement("p");
+  textEl.className = "detail-meta-text";
+  textEl.textContent = value;
+
+  row.appendChild(labelEl);
+  row.appendChild(textEl);
+  return row;
+}
+
+function createMetaListRow(label, values) {
+  if (!Array.isArray(values) || values.length === 0) return null;
+
+  const row = document.createElement("div");
+  row.className = "detail-meta-row";
+
+  const labelEl = document.createElement("div");
+  labelEl.className = "detail-meta-label";
+  labelEl.textContent = `● ${label}`;
+
+  const listEl = document.createElement("ul");
+  listEl.className = "detail-meta-list";
+
+  for (const value of values) {
+    const itemEl = document.createElement("li");
+    itemEl.textContent = value;
+    listEl.appendChild(itemEl);
+  }
+
+  row.appendChild(labelEl);
+  row.appendChild(listEl);
+  return row;
+}
+
+function createRequestDeptText(value) {
+  if (!value) return null;
+
+  const textEl = document.createElement("p");
+  textEl.className = "detail-request-text";
+  textEl.textContent = `(요청 부서: ${value})`;
+  return textEl;
+}
+
+function renderDetails(details, fallbackContext) {
+  const listEl = document.getElementById("detailsList");
+  if (!listEl) return;
+
+  listEl.innerHTML = "";
+
+  const normalizedDetails = details.length > 0
+    ? details
+    : (
+        fallbackContext.purpose ||
+        fallbackContext.usage ||
+        fallbackContext.collaboration
+      )
+        ? [{
+            title: "주요 항목",
+            purpose: fallbackContext.purpose,
+            usage: fallbackContext.usage ? [fallbackContext.usage] : [],
+            collaboration: fallbackContext.collaboration
+          }]
+        : [];
+
+  setSectionVisible("detailsSection", normalizedDetails.length > 0);
+
+  for (const [index, detail] of normalizedDetails.entries()) {
+    const card = document.createElement("article");
+    card.className = "detail-card";
+
+    const title = document.createElement("h3");
+    title.className = "detail-title";
+    title.textContent = `${index + 1}. ${detail.title}`;
+    card.appendChild(title);
+
+    const metaRows = [
+      createMetaRow("제작 의도", detail.purpose),
+      createMetaListRow("활용 목적", detail.usage)
+    ].filter(Boolean);
+
+    for (const row of metaRows) {
+      card.appendChild(row);
+    }
+
+    const requestText = createRequestDeptText(detail.collaboration);
+    if (requestText) {
+      card.appendChild(requestText);
+    }
+
+    listEl.appendChild(card);
+  }
+}
+
+function closeDialogSafely(reason) {
+  try { window.tableau?.extensions?.ui?.closeDialog(reason); } catch (_) {}
+}
+
 function badgeTextFromDashboardName(name) {
   if (!name) return "";
-  // "대시보드" 단어 제거 + 공백 정리
   const cleaned = String(name)
     .replace(/대시보드/g, "")
     .replace(/\s+/g, " ")
@@ -58,15 +223,15 @@ function badgeTextFromDashboardName(name) {
 
 (async function main() {
   try {
-    await tableau.extensions.initializeDialogAsync();
+    if (window.tableau?.extensions?.initializeDialogAsync) {
+      await tableau.extensions.initializeDialogAsync();
+    }
 
-    const payload = readPayload();
-    const dashboardName = (payload.dashboardName || "").trim();
-    const version = payload.version || "";
-    const items = normalizeItems(payload.items);
+    const payload = normalizePayload(readPayload());
+    const { dashboardName, version, summary, highlights, context, details } = payload;
 
-    if (!dashboardName || !version || items.length === 0) {
-      tableau.extensions.ui.closeDialog("invalid_payload");
+    if (!dashboardName || !version || (!summary && highlights.length === 0 && details.length === 0)) {
+      closeDialogSafely("invalid_payload");
       return;
     }
 
@@ -78,13 +243,15 @@ function badgeTextFromDashboardName(name) {
       badge.style.display = "inline-flex";
     }
 
-    // 헤더 날짜
     const headerDate = formatYYMMDDFromVersion(version);
     setText("headerDate", headerDate ? `(일자: ${headerDate})` : "");
 
-    renderList(items);
+    renderSummary(summary);
+    setSectionVisible("highlightsSection", highlights.length > 0);
+    renderList(highlights);
+    renderDetails(details, context);
   } catch (e) {
-    try { tableau.extensions.ui.closeDialog("error"); } catch (_) {}
+    closeDialogSafely("error");
     console.error(e);
   }
 })();

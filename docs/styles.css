@@ -2,24 +2,34 @@ html, body {
   margin: 0;
   padding: 0;
   background: transparent;
-  font-family: sans-serif;
+  font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  color: #111;
 }
 
 #popup{
   box-sizing: border-box;
-  padding: 22px 22px 18px;
+  padding: 22px 22px 20px;
   max-height: 100vh;
   overflow: auto;
+  background: #fff;
 }
 
 .popup-info {
-  margin: 14px 0 18px 0;
-  padding: 10px 14px;
-  background-color: #f8f9fb;
-  border-radius: 6px;
-  font-size: 13px;
-  color: #555;
+  margin: 10px 0 14px 0;
+  padding: 0;
+  font-size: 12px;
+  color: #5b6472;
   line-height: 1.6;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.popup-info p {
+  margin: 0;
+}
+
+.popup-info p + p {
+  margin-top: 2px;
 }
 
 .header{
@@ -76,7 +86,41 @@ html, body {
 .divider{
   height: 1px;
   background: #e6e6e6;
-  margin: 14px 0 14px;
+  margin: 14px 0 18px;
+}
+
+.summary-card,
+.detail-card{
+  background: #f4f7fc;
+  border: 1px solid #dde6f3;
+  border-radius: 14px;
+}
+
+.summary-card{
+  background: #eef4ff;
+  border-color: #d3def0;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+
+.content-section{
+  margin-top: 16px;
+}
+
+.section-label{
+  font-size: 13px;
+  font-weight: 800;
+  color: #4b5563;
+  margin-bottom: 10px;
+}
+
+.summary-text{
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.65;
+  font-weight: 700;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 .items{
@@ -89,12 +133,78 @@ html, body {
   font-size: 16px;
   line-height: 1.65;
   color: #111;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.details-list{
+  display: grid;
+  gap: 12px;
+}
+
+.detail-card{
+  padding: 14px 16px;
+}
+
+.detail-title{
+  margin: 0 0 12px;
+  font-size: 17px;
+  font-weight: 800;
+  color: #1f2937;
+}
+
+.detail-meta-row + .detail-meta-row{
+  margin-top: 10px;
+}
+
+.detail-meta-label{
+  font-size: 14px;
+  font-weight: 800;
+  color: #36558f;
+  margin-bottom: 6px;
+}
+
+.detail-meta-text{
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #374151;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.detail-meta-list{
+  margin: 0;
+  padding-left: 18px;
+}
+
+.detail-meta-list li{
+  margin: 6px 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #374151;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.detail-request-text{
+  margin: 14px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #6b7280;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  text-align: right;
 }
 
 @media (max-width: 600px){
-  #popup{ padding: 18px 16px 14px; }
+  #popup{ padding: 18px 16px 16px; }
   .title{ font-size: 18px; }
   .items li{ font-size: 15px; }
   .header-date{ font-size: 13px; }
   .dash-badge{ font-size: 14px; padding: 6px 11px; }
+  .summary-text{ font-size: 16px; }
+  .detail-title{ font-size: 16px; }
+  .detail-meta-text{ font-size: 14px; }
+  .detail-meta-list li{ font-size: 14px; }
 }

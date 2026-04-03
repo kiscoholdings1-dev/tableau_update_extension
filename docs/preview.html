@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Update Popup Preview</title>
+  <link rel="stylesheet" href="styles.css?v=17" />
+  <style>
+    body {
+      background: #eef2f7;
+      padding: 24px;
+    }
+
+    .preview-shell {
+      max-width: 640px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #d8dee8;
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-shell">
+    <div id="popup">
+      <div class="header">
+        <div class="header-left">
+          <div class="title-row">
+            <div id="dashBadge" class="dash-badge" style="display:none;"></div>
+            <div class="title">업데이트 내역</div>
+            <div id="headerDate" class="header-date"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="popup-info">
+        <p>※ 업데이트가 있을 때 현재 브라우저에서 1회 자동으로 표시됩니다.</p>
+        <p>※ 브라우저나 PC가 바뀌면 다시 표시될 수 있습니다.</p>
+      </div>
+
+      <section id="summarySection" class="summary-card" style="display:none;">
+        <div class="section-label">요약</div>
+        <p id="summaryText" class="summary-text"></p>
+      </section>
+
+      <section id="highlightsSection" class="content-section" style="display:none;">
+        <div class="section-label">주요 내용</div>
+        <ul id="items" class="items"></ul>
+      </section>
+
+      <section id="detailsSection" class="content-section" style="display:none;">
+        <div class="section-label">상세 안내</div>
+        <div id="detailsList" class="details-list"></div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    window.__UPDATE_PREVIEW_PAYLOAD__ = {
+      dashboardName: "영업관수 대시보드",
+      version: "2026-04-03-01",
+      summary: "영업관수 대시보드 신규 개발, 날짜 선택 기능 개선",
+      highlights: [
+        "영업관수 수주 부문이 신규 대시보드로 추가되었습니다",
+        "시작날짜 옆 달력 아이콘을 클릭하면 사용법을 확인할 수 있습니다"
+      ],
+      details: [
+        {
+          title: "영업관수 대시보드 신규 개발",
+          purpose: "공공 수주 실계약 데이터를 기반으로 제강사별 수주 현황, 지역별 점유율, 단가 수준을 일 단위로 통합 분석해 시장 흐름과 경쟁 동향을 빠르게 파악할 수 있도록 구성",
+          usage: [
+            "나라장터 실제 계약 데이터를 바탕으로 제강사별 수주 점유율, 지역별 경쟁 구도, 수주 단가 수준을 확인할 수 있습니다. 회사 선택 기능으로 자회사 기준 수주 현황과 전체 시장 대비 점유 위치를 비교할 수 있습니다.",
+            "가격 전략 수립, 지역별 영업 자원 배분, 경쟁사 대응 전략 검토에 활용할 수 있습니다."
+          ],
+          collaboration: "영업기획팀"
+        }
+      ]
+    };
+  </script>
+  <script src="dialog.js?v=17"></script>
+</body>
+</html>

@@ -1,10 +1,10 @@
-// app.js?v=13
+// app.js?v=17
 if (typeof tableau === "undefined") {
   throw new Error("tableau is not defined");
 }
 
 const CONFIG_URL = "https://kiscoholdings1-dev.github.io/tableau_update_extension/updates.json";
-const EXT_VER = "13";
+const EXT_VER = "17";
 
 function seenKey(dashboardName) {
   return `seenVersion:${dashboardName}`;
@@ -22,6 +22,50 @@ async function fetchJson(url) {
 function normalizeItems(items) {
   const arr = Array.isArray(items) ? items : [];
   return arr.map((x) => String(x ?? "").trim()).filter(Boolean);
+}
+
+function normalizeText(value) {
+  return String(value ?? "").trim();
+}
+
+function normalizeContext(context) {
+  const source = context && typeof context === "object" ? context : {};
+  return {
+    purpose: normalizeText(source.purpose),
+    usage: normalizeText(source.usage),
+    collaboration: normalizeText(source.collaboration)
+  };
+}
+
+function normalizeDetails(details) {
+  const arr = Array.isArray(details) ? details : [];
+  return arr
+    .map((detail) => {
+      const source = detail && typeof detail === "object" ? detail : {};
+      const normalized = {
+        title: normalizeText(source.title),
+        purpose: normalizeText(source.purpose),
+        usage: normalizeItems(source.usage),
+        collaboration: normalizeText(source.collaboration)
+      };
+
+      if (!normalized.title) return null;
+      if (!normalized.purpose && normalized.usage.length === 0 && !normalized.collaboration) return null;
+      return normalized;
+    })
+    .filter(Boolean);
+}
+
+function normalizeConfig(config) {
+  if (!config || typeof config !== "object") return null;
+
+  return {
+    version: normalizeText(config.version),
+    summary: normalizeText(config.summary),
+    highlights: normalizeItems(config.highlights ?? config.items),
+    context: normalizeContext(config.context),
+    details: normalizeDetails(config.details)
+  };
 }
 
 function getSeenVersion(dashboardName) {
@@ -57,14 +101,13 @@ function markSeen(dashboardName, version) {
     const dashboardName = (tableau.extensions.dashboardContent.dashboard.name || "").trim();
 
     const data = await fetchJson(CONFIG_URL);
-    const config = data?.dashboardsByName?.[dashboardName];
+    const config = normalizeConfig(data?.dashboardsByName?.[dashboardName]);
 
     // 1) 버전 없으면 종료
     if (!config?.version) return;
 
     // 2) 변경사항 없으면 종료
-    const items = normalizeItems(config.items);
-    if (items.length === 0) return;
+    if (!config.summary && config.highlights.length === 0 && config.details.length === 0) return;
 
     // 3) 이미 본 버전이면 종료
     const seen = getSeenVersion(dashboardName);
@@ -74,8 +117,10 @@ function markSeen(dashboardName, version) {
     const payload = JSON.stringify({
       dashboardName,
       version: config.version,
-      title: config.title || "업데이트 안내",
-      items,
+      summary: config.summary,
+      highlights: config.highlights,
+      context: config.context,
+      details: config.details,
       extVer: EXT_VER
     });
 
