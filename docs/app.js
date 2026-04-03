@@ -132,8 +132,8 @@ function markSeen(dashboardName, version) {
 
     try {
       await tableau.extensions.ui.displayDialogAsync(dialogUrl, payload, {
-        width: 600,
-        height: 520
+        width: 680,
+        height: 860
       });
     } catch (err) {
       // 사용자가 X/ESC로 닫는 건 정상: 조용히 무시
